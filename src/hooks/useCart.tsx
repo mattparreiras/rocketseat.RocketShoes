@@ -34,7 +34,26 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const addProduct = async (productId: number) => {
     try {
-      // TODO
+      const product = cart.find(product=> product.id === productId);
+      const currentAmountOnCart = product ? product.amount : 0;
+
+      const stockResponse = await  api.get(`/stock/${productId}`) ;
+      const stockAmount = stockResponse.data.amount;
+
+      const newAmount = currentAmountOnCart+1
+
+      if (newAmount > stockAmount) {
+        toast.error('Ordered Quantity Out of Stock');
+        return;
+      }
+
+      if (product){
+        updateProductAmount({productId,amount:newAmount})
+      }else{
+        const productResponse = await  api.get(`/products/${productId}`) ;
+        const newProduct = productResponse.data
+        setCart([...cart, {...newProduct, amount: newAmount}])
+      }
     } catch {
       // TODO
     }
@@ -42,7 +61,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
-      // TODO
+      setCart(cart.filter(product=>product.id !=productId))
     } catch {
       // TODO
     }
@@ -53,7 +72,22 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
-      // TODO
+      if(amount<=0) return
+      const stockResponse = await  api.get(`/stock/${productId}`) ;
+      const stockAmount = stockResponse.data.amount;
+
+      if (amount > stockAmount) {
+        toast.error('Ordered Quantity Out of Stock');
+        return;
+      }
+
+      setCart(
+        cart.map(product => product.id === productId 
+            ? {...product, amount : amount} 
+            : product
+      ))
+
+
     } catch {
       // TODO
     }
