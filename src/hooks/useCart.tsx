@@ -85,7 +85,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         cart.map(product => product.id === productId 
             ? {...product, amount : amount} 
             : product
-      ))
+        )
+      )
 
 
     } catch {
