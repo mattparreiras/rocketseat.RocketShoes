@@ -23,7 +23,7 @@ const CartContext = createContext<CartContextData>({} as CartContextData);
 
 export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const [cart, setCart] = useState<Product[]>(() => {
-     const storagedCart = localStorage.cart
+     const storagedCart = localStorage.getItem('@RocketShoes:cart')
 
     if (storagedCart) {
        return JSON.parse(storagedCart);
@@ -54,10 +54,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         const newProduct = productResponse.data
         const newCart = [...cart, {...newProduct, amount: newAmount}]
         setCart(newCart)
-        localStorage.cart = JSON.stringify(newCart)
+        localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart))
       }
     } catch {
-      // TODO
+      
     }
   };
 
@@ -65,7 +65,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       let newCart = cart.filter(product=>product.id !== productId)
       setCart(newCart)
-      localStorage.cart = JSON.stringify(newCart)
+      localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart))
     } catch {
       // TODO
     }
@@ -89,7 +89,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           : product
       )
       setCart(newCart)
-      localStorage.cart = JSON.stringify(newCart)
+      localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart))
 
     } catch {
       // TODO
