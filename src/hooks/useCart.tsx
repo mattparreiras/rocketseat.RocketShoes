@@ -23,11 +23,11 @@ const CartContext = createContext<CartContextData>({} as CartContextData);
 
 export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const [cart, setCart] = useState<Product[]>(() => {
-    // const storagedCart = Buscar dados do localStorage
+     const storagedCart = localStorage.cart
 
-    // if (storagedCart) {
-    //   return JSON.parse(storagedCart);
-    // }
+    if (storagedCart) {
+       return JSON.parse(storagedCart);
+    }
 
     return [];
   });
@@ -52,7 +52,9 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       }else{
         const productResponse = await  api.get(`/products/${productId}`) ;
         const newProduct = productResponse.data
-        setCart([...cart, {...newProduct, amount: newAmount}])
+        const newCart = [...cart, {...newProduct, amount: newAmount}]
+        setCart(newCart)
+        localStorage.cart = JSON.stringify(newCart)
       }
     } catch {
       // TODO
@@ -61,7 +63,9 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
-      setCart(cart.filter(product=>product.id !=productId))
+      let newCart = cart.filter(product=>product.id !== productId)
+      setCart(newCart)
+      localStorage.cart = JSON.stringify(newCart)
     } catch {
       // TODO
     }
@@ -80,14 +84,12 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         toast.error('Ordered Quantity Out of Stock');
         return;
       }
-
-      setCart(
-        cart.map(product => product.id === productId 
-            ? {...product, amount : amount} 
-            : product
-        )
+      const newCart = cart.map(product => product.id === productId 
+          ? {...product, amount : amount} 
+          : product
       )
-
+      setCart(newCart)
+      localStorage.cart = JSON.stringify(newCart)
 
     } catch {
       // TODO
